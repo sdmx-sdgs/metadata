@@ -2,7 +2,9 @@
 
 ## Overview
 
-This project holds the code for an [authoring tool for producing SDMX SDG metadata](https://sdg-metadata-sdmx.herokuapp.com/). Additionally, this repository tracks the [versioned Microsoft Word template](https://github.com/sdmx-sdgs/metadata/blob/master/SDG_Metadata_Template.docx) which the authoring tool relies on.
+This repository tracks the Microsoft Word template which the [metadata authoring tool](https://github.com/sdmx-sdgs/metadata-authoring-tool) relies on.
+
+### :floppy_disk: [Download the latest version of the template](https://github.com/sdmx-sdgs/metadata/raw/master/SDG_Metadata_Template.docx).
 
 ## Changelog
 

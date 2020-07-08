@@ -52,7 +52,7 @@ Private Function isValidTableTitle(title As String) As Boolean
         Or title = "4. Other methodological considerations" _
         Or title = "5. Data availability and disaggregation" _
         Or title = "6. Comparability/deviation from international standards" _
-        Or title = "7. References and documentation"
+        Or title = "7. References and Documentation"
 End Function
 
 Private Function isValidControlTag(tag As String) As Boolean

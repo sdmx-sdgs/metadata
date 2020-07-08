@@ -1,4 +1,4 @@
-Private Sub Document_Open()
+Public Sub Protect_Template()
 
     Dim currentTable As table
     Dim currentRow As Row

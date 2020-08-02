@@ -1,8 +1,20 @@
 # Changelog
 
-## v2.4 - June 6, 2020
+## v3.0 - August 7, 2020
 
 > Status: Pending
+
+* Macro and button for importing an SDMX DSD
+
+## v2.5 - July 7, 2020
+
+> Status: Approved
+
+* Macro for protecting the document
+
+## v2.4 - June 6, 2020
+
+> Status: Approved
 
 * Added language dropdown
 

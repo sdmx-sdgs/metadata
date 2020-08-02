@@ -25,7 +25,11 @@ With fDialog
         If xDoc.Load(sFileName) = False Then
             MsgBox "Unable to load DSD. Reason: " & xDoc.parseError.reason
         End If
-        
+
+        If ActiveDocument.ProtectionType <> wdNoProtection Then
+            ActiveDocument.Unprotect
+        End If
+
         xDoc.SetProperty "SelectionNamespaces", "xmlns:str='http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure' xmlns:com='http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common'"
         Set root = xDoc.DocumentElement
         
@@ -72,7 +76,11 @@ With fDialog
             listEntryName = codeNode.SelectSingleNode("com:Name").Text
             dropdown.DropdownListEntries.Add listEntryName, listEntryValue
         Next codeNode
-        
+
+        Protect_Template
+
+        MsgBox "Successfully updated dropdowns."
+
     End If
 End With
 

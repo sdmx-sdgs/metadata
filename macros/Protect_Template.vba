@@ -4,15 +4,15 @@ Public Sub Protect_Template()
     Dim currentRow As Row
     Dim firstRowSkipped As Boolean
     Dim currentControl As ContentControl
-    
+
     If ActiveDocument.ProtectionType <> wdNoProtection Then
         ActiveDocument.Unprotect
     End If
-        
+
     For Each currentTable In ActiveDocument.tables
-        
+
         If isValidTableTitle(currentTable.title) Then
-            
+
             firstRowSkipped = False
             For Each currentRow In currentTable.Rows
                 If currentRow.Cells.Count = 2 Then
@@ -26,19 +26,19 @@ Public Sub Protect_Template()
         End If
 
     Next
-    
+
     For Each currentControl In ActiveDocument.ContentControls
-    
+
         If isValidControlTag(currentControl.tag) Then
             currentControl.Range.Select
             Selection.Editors.Add wdEditorEveryone
-            
+
         End If
-        
+
     Next
-    
+
     ActiveDocument.Protect wdAllowOnlyReading
-    
+
     Selection.GoTo What:=wdGoToLine, Which:=wdGoToAbsolute, Count:=1
 
 End Sub

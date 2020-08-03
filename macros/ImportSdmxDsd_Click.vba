@@ -53,6 +53,7 @@ With fDialog
             End If
             'In addition to the "Indicator" annotations combined above, use the code's Name.
             listEntryName = listEntryName & codeNode.SelectSingleNode("com:Name").Text
+            listEntryName = fixedListEntryName(listEntryName)
             dropdown.DropdownListEntries.Add listEntryName, listEntryValue
         Next codeNode
         
@@ -62,6 +63,7 @@ With fDialog
         For Each codeNode In root.SelectNodes("//str:Codelist[@id='CL_AREA']/str:Code")
             listEntryValue = codeNode.Attributes.getNamedItem("id").Text
             listEntryName = codeNode.SelectSingleNode("com:Name").Text
+            listEntryName = fixedListEntryName(listEntryName)
             'Reference area codes are duplicated in the global DSD, so we only use the numeric ones.
             If IsNumeric(listEntryValue) = True Then
                 dropdown.DropdownListEntries.Add listEntryName, listEntryValue
@@ -74,6 +76,7 @@ With fDialog
         For Each codeNode In root.SelectNodes("//str:Codelist[@id='CL_REPORTING_TYPE']/str:Code")
             listEntryValue = codeNode.Attributes.getNamedItem("id").Text
             listEntryName = codeNode.SelectSingleNode("com:Name").Text
+            listEntryName = fixedListEntryName(listEntryName)
             dropdown.DropdownListEntries.Add listEntryName, listEntryValue
         Next codeNode
 
@@ -85,3 +88,13 @@ With fDialog
 End With
 
 End Sub
+
+Private Function fixedListEntryName(listEntryName As String) As String
+
+    If Len(listEntryName) > 255 Then
+        listEntryName = Left(listEntryName, 250) & "..."
+    End If
+    
+    fixedListEntryName = listEntryName
+
+End Function

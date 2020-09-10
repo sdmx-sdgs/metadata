@@ -45,6 +45,7 @@ With fDialog
         'Populate the Series dropdown.
         Set dropdown = ActiveDocument.SelectContentControlsByTag("ddSeries").Item(1)
         dropdown.DropdownListEntries.Clear
+        dropdown.DropdownListEntries.Add "0.0.0 National series not in global framework", "_"
         For Each codeNode In root.SelectNodes("//str:Codelist[@id='CL_SERIES']/str:Code")
             listEntryValue = codeNode.Attributes.getNamedItem("id").Text
             listEntryName = ""

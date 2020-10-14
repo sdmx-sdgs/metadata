@@ -25,7 +25,7 @@ xDoc.validateOnParse = False
 
 With fDialog
     .Filters.Clear
-    .Title = "Select your SDMX DSD file"
+    .title = "Select your SDMX DSD file"
     .Filters.Add "XML Files", "*.xml?", 1
     .AllowMultiSelect = False
 
@@ -49,6 +49,15 @@ With fDialog
         For Each codeNode In root.SelectNodes("//str:Codelist[@id='CL_SERIES']/str:Code")
             listEntryValue = codeNode.Attributes.getNamedItem("id").Text
             listEntryName = ""
+            'Check for the "RetiredSeries" annotations.
+            For Each annotationNode In codeNode.SelectNodes("com:Annotations/com:Annotation")
+                If annotationNode.SelectSingleNode("com:AnnotationTitle").Text = "RetiredSeries" Then
+                    If listEntryName <> "" Then
+                        listEntryName = listEntryName & ", "
+                    End If
+                    listEntryName = listEntryName & "RETIRED"
+                End If
+            Next annotationNode
             'Combine all the "Indicator" annotations.
             For Each annotationNode In codeNode.SelectNodes("com:Annotations/com:Annotation")
                 If annotationNode.SelectSingleNode("com:AnnotationTitle").Text = "Indicator" Then
@@ -132,7 +141,7 @@ Private Function fixedListEntryName(listEntryName As String) As String
     If Len(listEntryName) > 255 Then
         listEntryName = Left(listEntryName, 250) & "..."
     End If
-    
+
     fixedListEntryName = listEntryName
 
 End Function

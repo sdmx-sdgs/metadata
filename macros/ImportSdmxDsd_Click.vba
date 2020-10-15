@@ -91,7 +91,7 @@ With fDialog
             listEntryName = fixedListEntryName(listEntryName, listEntryValue)
             'Reference area codes are duplicated in the global DSD, so we only use the numeric ones.
             If IsNumeric(listEntryValue) = True Then
-                If listEntryName = "World" Then
+                If listEntryName = "World (1)" Then
                     bRefAreaWorldExists = True
                 End If
                 cRefAreas.Add listEntryValue, listEntryName
@@ -113,10 +113,10 @@ With fDialog
         Next i
 
         If bRefAreaWorldExists Then
-            dropdown.DropdownListEntries.Add "World", "1"
+            dropdown.DropdownListEntries.Add "World (1)", "1"
         End If
         For i = 0 To UBound(aRefAreasAlphabetical)
-            If aRefAreasAlphabetical(i) <> "World" Then
+            If aRefAreasAlphabetical(i) <> "World (1)" Then
                 dropdown.DropdownListEntries.Add aRefAreasAlphabetical(i), cRefAreas(aRefAreasAlphabetical(i))
             End If
         Next i

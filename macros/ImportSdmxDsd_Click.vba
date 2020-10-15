@@ -45,7 +45,11 @@ With fDialog
         'Populate the Series dropdown.
         Set dropdown = ActiveDocument.SelectContentControlsByTag("ddSeries").Item(1)
         dropdown.DropdownListEntries.Clear
-        dropdown.DropdownListEntries.Add "0.0.0 National series not in global framework", "_"
+        'Always include a national catch-all option.
+        listEntryValue = "_"
+        listEntryName = fixedListEntryName("0.0.0 National series not in global framework", listEntryValue)
+        dropdown.DropdownListEntries.Add listEntryName, listEntryValue
+        'Get the rest from the DSD.
         For Each codeNode In root.SelectNodes("//str:Codelist[@id='CL_SERIES']/str:Code")
             listEntryValue = codeNode.Attributes.getNamedItem("id").Text
             listEntryName = ""
@@ -72,7 +76,7 @@ With fDialog
             End If
             'In addition to the "Indicator" annotations combined above, use the code's Name.
             listEntryName = listEntryName & codeNode.SelectSingleNode("com:Name").Text
-            listEntryName = fixedListEntryName(listEntryName)
+            listEntryName = fixedListEntryName(listEntryName, listEntryValue)
             dropdown.DropdownListEntries.Add listEntryName, listEntryValue
         Next codeNode
 
@@ -84,7 +88,7 @@ With fDialog
         For Each codeNode In root.SelectNodes("//str:Codelist[@id='CL_AREA']/str:Code")
             listEntryValue = codeNode.Attributes.getNamedItem("id").Text
             listEntryName = codeNode.SelectSingleNode("com:Name").Text
-            listEntryName = fixedListEntryName(listEntryName)
+            listEntryName = fixedListEntryName(listEntryName, listEntryValue)
             'Reference area codes are duplicated in the global DSD, so we only use the numeric ones.
             If IsNumeric(listEntryValue) = True Then
                 If listEntryName = "World" Then
@@ -123,7 +127,7 @@ With fDialog
         For Each codeNode In root.SelectNodes("//str:Codelist[@id='CL_REPORTING_TYPE']/str:Code")
             listEntryValue = codeNode.Attributes.getNamedItem("id").Text
             listEntryName = codeNode.SelectSingleNode("com:Name").Text
-            listEntryName = fixedListEntryName(listEntryName)
+            listEntryName = fixedListEntryName(listEntryName, listEntryValue)
             dropdown.DropdownListEntries.Add listEntryName, listEntryValue
         Next codeNode
 
@@ -136,11 +140,14 @@ End With
 
 End Sub
 
-Private Function fixedListEntryName(listEntryName As String) As String
+Private Function fixedListEntryName(listEntryName As String, listEntryValue As String) As String
 
-    If Len(listEntryName) > 255 Then
-        listEntryName = Left(listEntryName, 250) & "..."
+    If Len(listEntryName) > 200 Then
+        listEntryName = Left(listEntryName, 200) & "..."
     End If
+
+    'Also add the ID at the end, according to a naming convention.
+    listEntryName = listEntryName & " (" & listEntryValue & ")"
 
     fixedListEntryName = listEntryName
 

@@ -2,19 +2,24 @@
 
 ## v3.2 - October 20, 2020
 
+> Status: Approved
+
 * Change "Language" to a combo box so that any language code can be typed in
 * Link to the ISO Language Code list to make it easier for users to obtain a language code
 * Append code (in parentheses) to each option under "Reporting type", "Series", and "Reference area"
 * Prepend the word "RETIRED" to any retired series under "Series"
 * Update instructions at page 1 (paragraph under "Use only the metadata concepts provided")
+* Imported SDMX DSD 1.2
 
 ## v3.1 - September 10, 2020
+
+> Status: Approved
 
 * Add an option under "Series" for "0.0.0 National series not in global framework"
 
 ## v3.0 - August 7, 2020
 
-> Status: Pending
+> Status: Approved
 
 * Macro and button for importing an SDMX DSD
 

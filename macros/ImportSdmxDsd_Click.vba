@@ -8,6 +8,11 @@ Dim listEntryValue As String
 Dim listEntryName As String
 Dim dropdown As ContentControl
 
+Dim objFileSystem As Object
+Dim objTextFile As Object
+Dim sSdmxDsd As String
+Dim ccSdmxBox As ContentControl
+
 Dim cRefAreas As Collection
 Dim vRefArea As Variant
 Set cRefAreas = New Collection
@@ -19,6 +24,8 @@ Dim bRefAreaWorldExists As Boolean
 
 Set fDialog = Application.FileDialog(msoFileDialogFilePicker)
 Set xDoc = CreateObject("MSXML2.DOMDocument.6.0")
+
+Set objFileSystem = CreateObject("Scripting.FileSystemObject")
 
 xDoc.async = False
 xDoc.validateOnParse = False
@@ -38,6 +45,14 @@ With fDialog
         If ActiveDocument.ProtectionType <> wdNoProtection Then
             ActiveDocument.Unprotect
         End If
+
+        'Also load the DSD as plain text and save it hidden.
+        Set objTextFile = objFileSystem.OpenTextFile(sFileName, 1)
+        sSdmxDsd = objTextFile.ReadAll
+        Set ccSdmxBox = ActiveDocument.SelectContentControlsByTag("boxSdmxDsd").Item(1)
+        ccSdmxBox.Appearance = wdContentControlHidden
+        ccSdmxBox.Range.Text = sSdmxDsd
+        ccSdmxBox.Range.Font.Hidden = 1
 
         xDoc.SetProperty "SelectionNamespaces", "xmlns:str='http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure' xmlns:com='http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common'"
         Set root = xDoc.DocumentElement

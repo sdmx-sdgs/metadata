@@ -1,6 +1,6 @@
 Public Sub Protect_Template()
 
-    Dim currentTable As table
+    Dim currentTable As Table
     Dim currentRow As Row
     Dim firstRowSkipped As Boolean
     Dim currentControl As ContentControl
@@ -9,7 +9,7 @@ Public Sub Protect_Template()
         ActiveDocument.Unprotect
     End If
 
-    For Each currentTable In ActiveDocument.tables
+    For Each currentTable In ActiveDocument.Tables
 
         If isValidTableTitle(currentTable.title) Then
 

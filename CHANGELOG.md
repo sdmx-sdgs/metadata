@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.3 - October 23, 2020
+
+> Status: Pending
+
+* Support multiple SERIES with add/remove buttons
+
 ## v3.2 - October 20, 2020
 
 > Status: Approved

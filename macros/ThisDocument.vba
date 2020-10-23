@@ -240,7 +240,7 @@ Private Sub AddSeries_Click()
     End If
 
     Dim lastSeriesDropdown As ContentControl
-    Set lastSeriesDropdown = getLastSeriesButton()
+    Set lastSeriesDropdown = getLastSeriesDropdown()
 
     If lastSeriesDropdown Is Nothing Then
         Set lastSeriesDropdown = ActiveDocument.SelectContentControlsByTag("ddSeries").Item(1)
@@ -249,6 +249,10 @@ Private Sub AddSeries_Click()
     lastSeriesDropdown.Copy
     Selection.Collapse wdCollapseStart
     Selection.Paste
+    Selection.Range.InsertAfter vbNewLine
+
+    Set lastSeriesDropdown = getLastSeriesDropdown()
+    lastSeriesDropdown.Range.Select
 
     ActiveDocument.Protect wdAllowOnlyReading
 End Sub
@@ -259,18 +263,18 @@ Private Sub RemoveSeries_Click()
     End If
 
     Dim lastSeriesDropdown As ContentControl
-    Set lastSeriesDropdown = getLastSeriesButton()
+    Set lastSeriesDropdown = getLastSeriesDropdown()
 
     If Not lastSeriesDropdown Is Nothing Then
         With lastSeriesDropdown
-            ActiveDocument.Range(.Range.Start - 1, .Range.End + 2).Delete
+            ActiveDocument.Range(.Range.Start - 1, .Range.End + 3).Delete
         End With
     End If
 
     ActiveDocument.Protect wdAllowOnlyReading
 End Sub
 
-Private Function getLastSeriesButton() As ContentControl
+Private Function getLastSeriesDropdown() As ContentControl
     Dim seriesDropdowns As ContentControls
     Dim seriesDropdown As ContentControl
     Dim lastSeriesDropdown As ContentControl
@@ -289,5 +293,5 @@ Private Function getLastSeriesButton() As ContentControl
 
     End If
 
-    Set getLastSeriesButton = lastSeriesDropdown
+    Set getLastSeriesDropdown = lastSeriesDropdown
 End Function

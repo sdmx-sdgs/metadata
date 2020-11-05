@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.3 - October 23, 2020
+
+> Status: Pending
+
+* Support multiple SERIES with add/remove buttons
+* Embed the raw SDMX DSD during import
+
 ## v3.2 - October 20, 2020
 
 > Status: Approved

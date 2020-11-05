@@ -8,6 +8,11 @@ Dim listEntryValue As String
 Dim listEntryName As String
 Dim dropdown As ContentControl
 
+Dim objFileSystem As Object
+Dim objTextFile As Object
+Dim sSdmxDsd As String
+Dim ccSdmxBox As ContentControl
+
 Dim cRefAreas As Collection
 Dim vRefArea As Variant
 Set cRefAreas = New Collection
@@ -19,6 +24,8 @@ Dim bRefAreaWorldExists As Boolean
 
 Set fDialog = Application.FileDialog(msoFileDialogFilePicker)
 Set xDoc = CreateObject("MSXML2.DOMDocument.6.0")
+
+Set objFileSystem = CreateObject("Scripting.FileSystemObject")
 
 xDoc.async = False
 xDoc.validateOnParse = False
@@ -38,6 +45,14 @@ With fDialog
         If ActiveDocument.ProtectionType <> wdNoProtection Then
             ActiveDocument.Unprotect
         End If
+
+        'Also load the DSD as plain text and save it hidden.
+        Set objTextFile = objFileSystem.OpenTextFile(sFileName, 1)
+        sSdmxDsd = objTextFile.ReadAll
+        Set ccSdmxBox = ActiveDocument.SelectContentControlsByTag("boxSdmxDsd").Item(1)
+        ccSdmxBox.Appearance = wdContentControlHidden
+        ccSdmxBox.Range.Text = sSdmxDsd
+        ccSdmxBox.Range.Font.Hidden = 1
 
         xDoc.SetProperty "SelectionNamespaces", "xmlns:str='http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure' xmlns:com='http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common'"
         Set root = xDoc.DocumentElement
@@ -151,4 +166,132 @@ Private Function fixedListEntryName(listEntryName As String, listEntryValue As S
 
     fixedListEntryName = listEntryName
 
+End Function
+
+
+Public Sub Protect_Template()
+
+    Dim currentTable As Table
+    Dim currentRow As Row
+    Dim firstRowSkipped As Boolean
+    Dim currentControl As ContentControl
+
+    If ActiveDocument.ProtectionType <> wdNoProtection Then
+        ActiveDocument.Unprotect
+    End If
+
+    For Each currentTable In ActiveDocument.Tables
+
+        If isValidTableTitle(currentTable.title) Then
+
+            firstRowSkipped = False
+            For Each currentRow In currentTable.Rows
+                If currentRow.Cells.Count = 2 Then
+                    If firstRowSkipped Then
+                        currentRow.Cells(2).Select
+                        Selection.Editors.Add wdEditorEveryone
+                    End If
+                    firstRowSkipped = True
+                End If
+            Next
+        End If
+
+    Next
+
+    For Each currentControl In ActiveDocument.ContentControls
+
+        If isValidControlTag(currentControl.tag) Then
+            currentControl.Range.Select
+            Selection.Editors.Add wdEditorEveryone
+
+        End If
+
+    Next
+
+    ActiveDocument.Protect wdAllowOnlyReading
+
+    Selection.GoTo What:=wdGoToLine, Which:=wdGoToAbsolute, Count:=1
+
+End Sub
+
+Private Function isValidTableTitle(title As String) As Boolean
+    isValidTableTitle = _
+        title = "0. Indicator information" _
+        Or title = "1. Data reporter" _
+        Or title = "2. Definition, concepts, and classifications" _
+        Or title = "3. Data source type and data collection method" _
+        Or title = "4. Other methodological considerations" _
+        Or title = "5. Data availability and disaggregation" _
+        Or title = "6. Comparability/deviation from international standards" _
+        Or title = "7. References and Documentation"
+End Function
+
+Private Function isValidControlTag(tag As String) As Boolean
+    isValidControlTag = _
+        tag = "ddReportingType" _
+        Or tag = "ddSeries" _
+        Or tag = "ddRefArea" _
+        Or tag = "ddLanguage"
+End Function
+
+Private Sub AddSeries_Click()
+    If ActiveDocument.ProtectionType <> wdNoProtection Then
+        ActiveDocument.Unprotect
+    End If
+
+    Dim lastSeriesDropdown As ContentControl
+    Set lastSeriesDropdown = getLastSeriesDropdown()
+
+    If lastSeriesDropdown Is Nothing Then
+        Set lastSeriesDropdown = ActiveDocument.SelectContentControlsByTag("ddSeries").Item(1)
+    End If
+
+    lastSeriesDropdown.Copy
+    Selection.Collapse wdCollapseStart
+    Selection.Paste
+    Selection.Range.InsertAfter vbNewLine
+
+    Set lastSeriesDropdown = getLastSeriesDropdown()
+    lastSeriesDropdown.Range.Select
+
+    ActiveDocument.Protect wdAllowOnlyReading
+End Sub
+
+Private Sub RemoveSeries_Click()
+    If ActiveDocument.ProtectionType <> wdNoProtection Then
+        ActiveDocument.Unprotect
+    End If
+
+    Dim lastSeriesDropdown As ContentControl
+    Set lastSeriesDropdown = getLastSeriesDropdown()
+
+    If Not lastSeriesDropdown Is Nothing Then
+        With lastSeriesDropdown
+            ActiveDocument.Range(.Range.Start - 1, .Range.End + 3).Delete
+        End With
+    End If
+
+    ActiveDocument.Protect wdAllowOnlyReading
+End Sub
+
+Private Function getLastSeriesDropdown() As ContentControl
+    Dim seriesDropdowns As ContentControls
+    Dim seriesDropdown As ContentControl
+    Dim lastSeriesDropdown As ContentControl
+
+    Set seriesDropdowns = ActiveDocument.SelectContentControlsByTag("ddSeries")
+
+    If seriesDropdowns.Count > 1 Then
+
+        For Each seriesDropdown In seriesDropdowns
+            If lastSeriesDropdown Is Nothing Then
+                Set lastSeriesDropdown = seriesDropdown
+            ElseIf seriesDropdown.Range.Start > lastSeriesDropdown.Range.Start Then
+                Set lastSeriesDropdown = seriesDropdown
+            End If
+        Next seriesDropdown
+
+    End If
+
+    Set getLastSeriesDropdown = lastSeriesDropdown
 End Function

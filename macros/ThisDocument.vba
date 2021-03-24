@@ -1,3 +1,71 @@
+Private Sub ImportMetadata_Click()
+
+Dim fDialog As FileDialog
+Dim sFileName As String
+Dim xDoc As Object
+Dim root As Object
+Dim objFileSystem As Object
+Dim currentTable As Table
+Dim currentRow As Row
+Dim firstRowSkipped As Boolean
+Dim currentControl As ContentControl
+Dim sConceptTitle As String
+Dim sConceptId As String
+Dim sConceptText As String
+
+Set fDialog = Application.FileDialog(msoFileDialogFilePicker)
+Set xDoc = CreateObject("MSXML2.DOMDocument.6.0")
+Set objFileSystem = CreateObject("Scripting.FileSystemObject")
+
+xDoc.async = False
+xDoc.validateOnParse = False
+
+With fDialog
+    .Filters.Clear
+    .title = "Select your SDMX Metadata file"
+    .Filters.Add "XML Files", "*.xml?", 1
+    .AllowMultiSelect = False
+
+    If .Show Then
+        sFileName = .SelectedItems(1)
+        If xDoc.Load(sFileName) = False Then
+            MsgBox "Unable to load metadata. Reason: " & xDoc.parseError.reason
+        End If
+
+        xDoc.SetProperty "SelectionNamespaces", "xmlns:gen='http://www.sdmx.org/resources/sdmxml/schemas/v2_1/metadata/generic' xmlns:com='http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common'"
+        Set root = xDoc.DocumentElement
+
+        For Each currentTable In ActiveDocument.Tables
+
+            If isValidTableTitle(currentTable.title) Then
+
+                firstRowSkipped = False
+                For Each currentRow In currentTable.Rows
+                    If currentRow.Cells.Count = 2 Then
+                        If firstRowSkipped Then
+                            sConceptTitle = Application.CleanString(currentRow.Cells(1).Range.Text)
+                            sConceptTitle = Trim(sConceptTitle)
+                            sConceptTitle = Replace(sConceptTitle, vbTab, "")
+                            sConceptTitle = Replace(sConceptTitle, vbCr, "")
+                            sConceptTitle = Replace(sConceptTitle, vbLf, "")
+                            sConceptId = getConceptId(sConceptTitle)
+                            sConceptText = root.SelectSingleNode("//gen:ReportedAttribute[@id='" & sConceptId & "']/com:Text").Text
+                            currentRow.Cells(2).Range.Text = sConceptText
+                        End If
+                        firstRowSkipped = True
+                    End If
+                Next
+            End If
+
+        Next
+
+        MsgBox "Successfully imported metadata."
+
+    End If
+End With
+
+End Sub
+
 Private Sub ImportSdmxDsd_Click()
 
 Dim fDialog As FileDialog
@@ -213,6 +281,98 @@ Public Sub Protect_Template()
     Selection.GoTo What:=wdGoToLine, Which:=wdGoToAbsolute, Count:=1
 
 End Sub
+
+Private Function getConceptId(conceptTitle As String) As String
+
+    Select Case conceptTitle
+        Case "0. Indicator information"
+            getConceptId = "SDG_INDICATOR_INFO"
+        Case "0.a. Goal"
+            getConceptId = "SDG_GOAL"
+        Case "0.b. Target"
+            getConceptId = "SDG_TARGET"
+        Case "0.c. Indicator"
+            getConceptId = "SDG_INDICATOR"
+        Case "0.d. Series"
+            getConceptId = "SDG_SERIES_DESCR"
+        Case "0.e. Metadata update"
+            getConceptId = "META_LAST_UPDATE"
+        Case "0.f. Related indicators"
+            getConceptId = "SDG_RELATED_INDICATORS"
+        Case "0.g. International organisations(s) responsible for global monitoring"
+            getConceptId = "SDG_CUSTODIAN_AGENCIES"
+        Case "1. Data reporter"
+            getConceptId = "CONTACT"
+        Case "1.a. Organisation"
+            getConceptId = "CONTACT_ORGANISATION"
+        Case "1.b. Contact person(s)"
+            getConceptId = "CONTACT_NAME"
+        Case "1.c. Contact organisation unit"
+            getConceptId = "ORGANISATION_UNIT"
+        Case "1.d. Contact person function"
+            getConceptId = "CONTACT_FUNCT"
+        Case "1.e. Contact phone"
+            getConceptId = "CONTACT_PHONE"
+        Case "1.f. Contact mail"
+            getConceptId = "CONTACT_MAIL"
+        Case "1.g. Contact email"
+            getConceptId = "CONTACT_EMAIL"
+        Case "2. Definition, concepts, and classifications"
+            getConceptId = "IND_DEF_CON_CLASS"
+        Case "2.a. Definition and concepts"
+            getConceptId = "STAT_CONC_DEF"
+        Case "2.b. Unit of measure"
+            getConceptId = "UNIT_MEASURE"
+        Case "2.c. Classifications"
+            getConceptId = "CLASS_SYSTEM"
+        Case "3. Data source type and collection method"
+            getConceptId = "SRC_TYPE_COLL_METHOD"
+        Case "3.a. Data sources"
+            getConceptId = "SOURCE_TYPE"
+        Case "3.b. Data collection method"
+            getConceptId = "COLL_METHOD"
+        Case "3.c. Data collection calendar"
+            getConceptId = "FREQ_COLL"
+        Case "3.d. Data release calendar"
+            getConceptId = "REL_CAL_POLICY"
+        Case "3.e. Data providers"
+            getConceptId = "DATA_SOURCE"
+        Case "3.f. Data compilers"
+            getConceptId = "COMPILING_ORG"
+        Case "3.g. Institutional mandate"
+            getConceptId = "INST_MANDATE"
+        Case "4. Other methodological considerations"
+            getConceptId = "OTHER_METHOD"
+        Case "4.a. Rationale"
+            getConceptId = "RATIONALE"
+        Case "4.b. Comment and limitations"
+            getConceptId = "REC_USE_LIM"
+        Case "4.c. Method of computation"
+            getConceptId = "DATA_COMP"
+        Case "4.d. Validation"
+            getConceptId = "DATA_VALIDATION"
+        Case "4.e. Adjustments"
+            getConceptId = "ADJUSTMENT"
+        Case "4.f. Treatment of missing values (i) at country level and (ii) at regional level"
+            getConceptId = "IMPUTATION"
+        Case "4.g. Regional aggregations"
+            getConceptId = "REG_AGG"
+        Case "4.h. Methods and guidance available to countries for the compilation of the data at the national level"
+            getConceptId = "DOC_METHOD"
+        Case "4.i. Quality management"
+            getConceptId = "QUALITY_MGMNT"
+        Case "4.j. Quality assurance"
+            getConceptId = "QUALITY_ASSURE"
+        Case "4.k. Quality assessment"
+            getConceptId = "QUALITY_ASSMNT"
+        Case "5. Data availability and disaggregation"
+            getConceptId = "COVERAGE"
+        Case "6. Comparability/deviation from international standards"
+            getConceptId = "COMPARABILITY"
+        Case "7. References and Documentation"
+            getConceptId = "OTHER_DOC"
+    End Select
+End Function
 
 Private Function isValidTableTitle(title As String) As Boolean
     isValidTableTitle = _

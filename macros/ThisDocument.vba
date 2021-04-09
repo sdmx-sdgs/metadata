@@ -17,10 +17,16 @@ Dim cRefAreas As Collection
 Dim vRefArea As Variant
 Set cRefAreas = New Collection
 
+Dim sRefAreaCodeListId As String
+Dim sSeriesCodeListId As String
+Dim sReportingTypeCodeListId As String
+
 Dim aRefAreasAlphabetical() As String
 ReDim aRefAreasAlphabetical(10000)
 Dim iRefAreaIndex As Integer
 Dim bRefAreaWorldExists As Boolean
+
+Dim objAnnotationTitle As Object
 
 Set fDialog = Application.FileDialog(msoFileDialogFilePicker)
 Set xDoc = CreateObject("MSXML2.DOMDocument.6.0")
@@ -65,12 +71,15 @@ With fDialog
         listEntryName = fixedListEntryName("0.0.0 National series not in global framework", listEntryValue)
         dropdown.DropdownListEntries.Add listEntryName, listEntryValue
         'Get the rest from the DSD.
-        For Each codeNode In root.SelectNodes("//str:Codelist[@id='CL_SERIES']/str:Code")
+        sSeriesCodeListId = root.SelectSingleNode("//str:Dimension[@id='SERIES']/str:LocalRepresentation/str:Enumeration/Ref").Attributes.getNamedItem("id").Text
+        For Each codeNode In root.SelectNodes("//str:Codelist[@id='" & sSeriesCodeListId & "']/str:Code")
             listEntryValue = codeNode.Attributes.getNamedItem("id").Text
             listEntryName = ""
             'Check for the "RetiredSeries" annotations.
             For Each annotationNode In codeNode.SelectNodes("com:Annotations/com:Annotation")
-                If annotationNode.SelectSingleNode("com:AnnotationTitle").Text = "RetiredSeries" Then
+                Set objAnnotationTitle = annotationNode.SelectSingleNode("com:AnnotationTitle")
+                If objAnnotationTitle Is Nothing Then
+                ElseIf objAnnotationTitle.Text = "RetiredSeries" Then
                     If listEntryName <> "" Then
                         listEntryName = listEntryName & ", "
                     End If
@@ -79,7 +88,9 @@ With fDialog
             Next annotationNode
             'Combine all the "Indicator" annotations.
             For Each annotationNode In codeNode.SelectNodes("com:Annotations/com:Annotation")
-                If annotationNode.SelectSingleNode("com:AnnotationTitle").Text = "Indicator" Then
+                Set objAnnotationTitle = annotationNode.SelectSingleNode("com:AnnotationTitle")
+                If objAnnotationTitle Is Nothing Then
+                ElseIf objAnnotationTitle.Text = "Indicator" Then
                     If listEntryName <> "" Then
                         listEntryName = listEntryName & ", "
                     End If
@@ -100,19 +111,17 @@ With fDialog
         dropdown.DropdownListEntries.Clear
         iRefAreaIndex = 0
         bRefAreaWorldExists = False
-        For Each codeNode In root.SelectNodes("//str:Codelist[@id='CL_AREA']/str:Code")
+        sRefAreaCodeListId = root.SelectSingleNode("//str:Dimension[@id='REF_AREA']/str:LocalRepresentation/str:Enumeration/Ref").Attributes.getNamedItem("id").Text
+        For Each codeNode In root.SelectNodes("//str:Codelist[@id='" & sRefAreaCodeListId & "']/str:Code")
             listEntryValue = codeNode.Attributes.getNamedItem("id").Text
             listEntryName = codeNode.SelectSingleNode("com:Name").Text
             listEntryName = fixedListEntryName(listEntryName, listEntryValue)
-            'Reference area codes are duplicated in the global DSD, so we only use the numeric ones.
-            If IsNumeric(listEntryValue) = True Then
-                If listEntryName = "World (1)" Then
-                    bRefAreaWorldExists = True
-                End If
-                cRefAreas.Add listEntryValue, listEntryName
-                aRefAreasAlphabetical(iRefAreaIndex) = listEntryName
-                iRefAreaIndex = iRefAreaIndex + 1
+            If listEntryName = "World (1)" Then
+                bRefAreaWorldExists = True
             End If
+            cRefAreas.Add listEntryValue, listEntryName
+            aRefAreasAlphabetical(iRefAreaIndex) = listEntryName
+            iRefAreaIndex = iRefAreaIndex + 1
         Next codeNode
 
         'Sort alphabetically.
@@ -139,7 +148,8 @@ With fDialog
         'Populate the Reporting Type dropdown.
         Set dropdown = ActiveDocument.SelectContentControlsByTag("ddReportingType").Item(1)
         dropdown.DropdownListEntries.Clear
-        For Each codeNode In root.SelectNodes("//str:Codelist[@id='CL_REPORTING_TYPE']/str:Code")
+        sReportingTypeCodeListId = root.SelectSingleNode("//str:Dimension[@id='REPORTING_TYPE']/str:LocalRepresentation/str:Enumeration/Ref").Attributes.getNamedItem("id").Text
+        For Each codeNode In root.SelectNodes("//str:Codelist[@id='" & sReportingTypeCodeListId & "']/str:Code")
             listEntryValue = codeNode.Attributes.getNamedItem("id").Text
             listEntryName = codeNode.SelectSingleNode("com:Name").Text
             listEntryName = fixedListEntryName(listEntryName, listEntryValue)

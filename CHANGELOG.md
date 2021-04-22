@@ -1,8 +1,17 @@
 # Changelog
 
-## v3.3 - October 23, 2020
+## v3.4 - April 21, 2021
 
 > Status: Pending
+
+* Bugfix: Import DSDs with missing annotations
+* Bugfix: Import DSDs with codelists with different IDs
+* Bugfix: Import non-numeric reference areas from national DSDs
+* Separate macro for importing the global DSD
+
+## v3.3 - October 23, 2020
+
+> Status: Approved
 
 * Support multiple SERIES with add/remove buttons
 * Embed the raw SDMX DSD during import

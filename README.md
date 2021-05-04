@@ -12,13 +12,11 @@ Changes are tracked in [this changelog file](https://github.com/sdmx-sdgs/metada
 
 ## Importing a national DSD
 
-1. Click the "Import SDMX DSD" button
+1. Click the "Import SDMX DSD from file" button
 2. Browse and select your national DSD file
 3. Save and exit
 
 ## Importing the global DSD
 
-1. Click the "Developer" button in Word
-2. Click the "Macros" button
-3. Double-click the "Import_Global_SDMX_DSD" macro
-4. Save and exit
+1. Click the "Import SDMX DSD from Global Registry" button
+2. Save and exit

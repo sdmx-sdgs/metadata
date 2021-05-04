@@ -1,13 +1,13 @@
 # Changelog
 
-## v3.4 - April 21, 2021
+## v3.4 - May 3, 2021
 
 > Status: Pending
 
 * Bugfix: Import DSDs with missing annotations
 * Bugfix: Import DSDs with codelists with different IDs
 * Bugfix: Import non-numeric reference areas from national DSDs
-* Separate macro for importing the global DSD
+* Separate button for importing the global DSD
 
 ## v3.3 - October 23, 2020
 

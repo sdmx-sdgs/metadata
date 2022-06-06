@@ -1,3 +1,10 @@
+Private Sub Document_ContentControlOnExit(ByVal ContentControl As ContentControl, Cancel As Boolean)
+    If (ContentControl.Type = wdContentControlDate) And (Not IsDate(ContentControl.Range.Text)) And (ContentControl.Range.Text <> ContentControl.PlaceholderText) Then
+        MsgBox "Please enter a date in the following format: YYYY-MM-DD"
+        Cancel = True
+    End If
+End Sub
+
 Private Sub ImportSdmxDsdGlobal_Click()
 
 Dim sGlobalDsd As String
